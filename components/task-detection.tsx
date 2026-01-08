@@ -1,37 +1,56 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Mail, FileText, MessageSquare } from "lucide-react"
+import { Mail, FileText, MessageSquare, Loader2 } from "lucide-react"
+import { fetchTasks, type Task } from "@/lib/api"
+
+const sourceIcons: Record<string, typeof Mail> = {
+  Email: Mail,
+  Document: FileText,
+  Slack: MessageSquare,
+  Message: MessageSquare,
+}
 
 export default function TaskDetection() {
   const [showTasks, setShowTasks] = useState(false)
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const extractedTasks = [
-    {
-      title: "Review and approve design mockups",
-      priority: 1,
-      source: "Email",
-      icon: Mail,
-      explanation: "Received from design team this morning",
-    },
-    {
-      title: "Prepare budget forecast",
-      priority: 2,
-      source: "Document",
-      icon: FileText,
-      explanation: "Mentioned in Q1 planning document",
-    },
-    {
-      title: "Sync with product team",
-      priority: 2,
-      source: "Slack",
-      icon: MessageSquare,
-      explanation: "Action items from yesterday's discussion",
-    },
-  ]
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        setLoading(true)
+        const data = await fetchTasks()
+        setTasks(data)
+        setError(null)
+      } catch (err) {
+        setError("Failed to load tasks")
+        console.error("Error fetching tasks:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadTasks()
+  }, [])
+
+  // Map tasks to extracted tasks format
+  const extractedTasks = tasks.slice(0, 3).map((task, idx) => {
+    // Determine source based on context or use default
+    const source = task.context.includes("Hackathon") ? "Email" : task.context.includes("College") ? "Document" : "Slack"
+    const IconComponent = sourceIcons[source] || Mail
+    
+    return {
+      title: task.title,
+      priority: idx + 1,
+      source: source,
+      icon: IconComponent,
+      explanation: task.explanation,
+    }
+  })
 
   return (
     <Card className="border-slate-200 shadow-sm rounded-2xl">
@@ -44,7 +63,17 @@ export default function TaskDetection() {
           {showTasks ? "Hide" : "Show"} Extracted Tasks
         </Button>
 
-        {showTasks && (
+        {loading && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="text-center text-slate-500 text-sm py-4">{error}</div>
+        )}
+
+        {showTasks && !loading && !error && extractedTasks.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {extractedTasks.map((task, idx) => {
               const IconComponent = task.icon
@@ -73,6 +102,10 @@ export default function TaskDetection() {
               )
             })}
           </div>
+        )}
+
+        {showTasks && !loading && !error && extractedTasks.length === 0 && (
+          <div className="text-center text-slate-500 text-sm py-4">No tasks available</div>
         )}
       </CardContent>
     </Card>

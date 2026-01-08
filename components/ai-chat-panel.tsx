@@ -62,7 +62,7 @@ export default function AIChatPanel({ isOpen, onClose }: AIChatPanelProps) {
       const errorMessage: Message = {
         role: "assistant",
         content:
-          "Sorry, I couldn't process your question right now. Please make sure the backend server is running and LM Studio is started.",
+          "Sorry, I couldn't process your question right now. Please make sure the backend server is running and Ollama is started.",
       }
       setMessages((prev) => [...prev, errorMessage])
     } finally {
@@ -86,7 +86,7 @@ export default function AIChatPanel({ isOpen, onClose }: AIChatPanelProps) {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 p-6">
+        <ScrollArea className="flex-1 p-6 min-h-0">
           <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center text-slate-500 text-sm py-8">
