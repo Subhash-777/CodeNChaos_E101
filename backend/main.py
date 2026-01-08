@@ -7,6 +7,7 @@ from typing import List, Dict, Any
 from datetime import datetime, timedelta
 import os
 import random
+from pathlib import Path
 
 app = FastAPI(title="Productivity Dashboard API")
 
@@ -23,18 +24,58 @@ app.add_middleware(
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:3b-instruct")
 
+# Load mock data from JSON file
+MOCK_DATA_PATH = Path(__file__).parent / "mock.json"
+
+def load_mock_data() -> Dict[str, Any]:
+    """Load mock data from JSON file"""
+    try:
+        with open(MOCK_DATA_PATH, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        # Return empty structure if file doesn't exist
+        return {
+            "emails": [],
+            "calendar": [],
+            "tasks": [],
+            "documents": [],
+            "contexts": [],
+            "cognitive_load": {},
+            "insights": [],
+            "recommendations": []
+        }
+    except json.JSONDecodeError:
+        raise ValueError(f"Invalid JSON in {MOCK_DATA_PATH}")
+
 
 class AssistantQuery(BaseModel):
     query: str
 
 
 # ============================================================================
-# MOCK DATA FUNCTIONS - All data is in this file as requested
+# MOCK DATA FUNCTIONS - Load from mock.json file
 # ============================================================================
 
 def get_active_contexts() -> List[Dict[str, Any]]:
-    """Fetch from your SQLite/JSON storage"""
-    return [
+    """Fetch from mock.json file"""
+    data = load_mock_data()
+    contexts = data.get("contexts", [])
+    
+    # Format contexts to match expected structure
+    formatted = []
+    for ctx in contexts:
+        # Get related tasks
+        related_tasks = [t.get("title", "") for t in data.get("tasks", []) if t.get("context") == ctx.get("name")]
+        formatted.append({
+            "id": ctx.get("id", ""),
+            "name": ctx.get("name", ""),
+            "related_items": ctx.get("related_items", {}).get("emails", []) + ctx.get("related_items", {}).get("documents", []),
+            "urgency": ctx.get("urgency", "medium"),
+            "deadline": ctx.get("deadline", ""),
+            "tasks": related_tasks[:3]  # Limit to 3 tasks
+        })
+    
+    return formatted if formatted else [
         {
             "id": "ctx_hackathon",
             "name": "Hackathon Review",
@@ -42,62 +83,49 @@ def get_active_contexts() -> List[Dict[str, Any]]:
             "urgency": "high",
             "deadline": (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d"),
             "tasks": ["Finalize proposal deck", "Schedule team sync", "Prepare demo materials"]
-        },
-        {
-            "id": "ctx_college",
-            "name": "College",
-            "related_items": ["doc_05", "email_03"],
-            "urgency": "medium",
-            "deadline": (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d"),
-            "tasks": ["Complete research paper", "Prepare presentation", "Review syllabus updates"]
         }
     ]
 
 
 def get_prioritized_tasks() -> List[Dict[str, Any]]:
-    """Fetch from your task extraction layer"""
-    return [
-        {
-            "id": "task_01",
-            "title": "Review and approve design mockups",
-            "context": "Hackathon Review",
-            "deadline": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
-            "priority_score": 87,
-            "status": "in_progress",
-            "explanation": "Design team is waiting for feedback to proceed with development. Deadline tomorrow + high importance"
-        },
-        {
-            "id": "task_02",
-            "title": "Prepare budget forecast",
-            "context": "Hackathon Review",
-            "deadline": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
-            "priority_score": 75,
-            "status": "not_started",
-            "explanation": "Q1 planning meeting is tomorrow morning"
-        },
-        {
-            "id": "task_03",
-            "title": "Complete research paper",
-            "context": "College",
-            "deadline": (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d"),
-            "priority_score": 65,
-            "status": "not_started",
-            "explanation": "Due in 7 days + medium importance"
-        },
-        {
-            "id": "task_04",
-            "title": "Sync with product team",
-            "context": "Hackathon Review",
-            "deadline": None,
-            "priority_score": 55,
-            "status": "not_started",
-            "explanation": "Outstanding action items from weekly standup"
-        }
-    ]
+    """Fetch from mock.json file"""
+    data = load_mock_data()
+    tasks = data.get("tasks", [])
+    
+    # Format tasks to match expected structure
+    formatted = []
+    for task in tasks:
+        deadline = task.get("deadline")
+        if deadline:
+            # Convert ISO format to YYYY-MM-DD
+            try:
+                deadline_dt = datetime.fromisoformat(deadline.replace("Z", "+00:00"))
+                deadline = deadline_dt.strftime("%Y-%m-%d")
+            except:
+                deadline = deadline[:10] if len(deadline) >= 10 else deadline
+        
+        formatted.append({
+            "id": task.get("id", ""),
+            "title": task.get("title", ""),
+            "context": task.get("context", ""),
+            "deadline": deadline,
+            "priority_score": task.get("priority_score", 50),
+            "status": task.get("status", "not_started"),
+            "explanation": task.get("explanation", "")
+        })
+    
+    return formatted if formatted else []
 
 
 def get_cognitive_load() -> Dict[str, Any]:
-    """Fetch from your cognitive load estimator"""
+    """Fetch from mock.json file"""
+    data = load_mock_data()
+    cognitive_load = data.get("cognitive_load", {})
+    
+    if cognitive_load:
+        return cognitive_load
+    
+    # Fallback if not in JSON
     return {
         "score": 78,
         "status": "High",
@@ -109,48 +137,40 @@ def get_cognitive_load() -> Dict[str, Any]:
 
 
 def get_latest_insights() -> List[Dict[str, Any]]:
-    """Fetch from behavioral analysis layer"""
-    return [
-        {
-            "type": "context_switching",
-            "severity": "high",
-            "count": 12,
-            "message": "You switched between contexts 12 times today, losing ~4 hours of focus time"
-        },
-        {
-            "type": "ignored_priority",
-            "severity": "medium",
-            "task": "Review and approve design mockups",
-            "message": "Design mockups review (high priority) has no activity for 2 days"
-        },
-        {
-            "type": "deadline_proximity",
-            "severity": "high",
-            "tasks": ["Review and approve design mockups", "Prepare budget forecast"],
-            "message": "2 tasks with deadlines tomorrow need immediate attention"
-        }
-    ]
+    """Fetch from mock.json file"""
+    data = load_mock_data()
+    insights = data.get("insights", [])
+    
+    # Format insights to match expected structure
+    formatted = []
+    for insight in insights:
+        formatted.append({
+            "type": insight.get("type", ""),
+            "severity": insight.get("severity", "medium"),
+            "count": insight.get("count"),
+            "task": insight.get("task"),
+            "tasks": insight.get("tasks"),
+            "message": insight.get("message", "")
+        })
+    
+    return formatted if formatted else []
 
 
 def get_recommendations() -> List[Dict[str, Any]]:
-    """Fetch from recommendation engine"""
-    return [
-        {
-            "action": "Block 9-11 AM tomorrow for Hackathon Review only",
-            "reason": "Deadline tomorrow + high switching detected",
-            "expected_impact": "Complete design review and budget forecast in single focus session"
-        },
-        {
-            "action": "Defer College tasks to next week",
-            "reason": "Reduce cognitive load from 78 to ~50",
-            "expected_impact": "Lower stress and finish urgent work first"
-        },
-        {
-            "action": "Batch all Hackathon Review tasks together",
-            "reason": "Minimize context switching between related work",
-            "expected_impact": "Complete 3 tasks in 2 hours instead of 4 hours"
-        }
-    ]
+    """Fetch from mock.json file"""
+    data = load_mock_data()
+    recommendations = data.get("recommendations", [])
+    
+    # Format recommendations to match expected structure
+    formatted = []
+    for rec in recommendations:
+        formatted.append({
+            "action": rec.get("action", ""),
+            "reason": rec.get("reason", ""),
+            "expected_impact": rec.get("expected_impact", "")
+        })
+    
+    return formatted if formatted else []
 
 
 # ============================================================================

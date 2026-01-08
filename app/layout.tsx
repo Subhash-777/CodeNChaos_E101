@@ -7,7 +7,19 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'DashBoard',
+  title: 'Dashboard - Personal Productivity Intelligence',
+  description: 'Dashboard - Personal Productivity Intelligence',
+  icons: {
+    icon: '/icon.svg',
+  },
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 }
 
 export default function RootLayout({

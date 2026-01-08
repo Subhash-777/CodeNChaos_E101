@@ -1,0 +1,315 @@
+{
+  "emails": [
+    {
+      "id": "email_01",
+      "from": "design-team@company.com",
+      "to": "user@company.com",
+      "subject": "Design Mockups Ready for Review",
+      "body": "Hi, we've completed the design mockups for the Hackathon Review project. Please review and provide feedback by tomorrow so we can proceed with development.",
+      "date": "2026-01-08T09:30:00Z",
+      "priority": "high",
+      "read": false,
+      "attachments": ["mockup-v1.pdf"],
+      "labels": ["work", "urgent", "hackathon"]
+    },
+    {
+      "id": "email_02",
+      "from": "finance@company.com",
+      "to": "user@company.com",
+      "subject": "Q1 Budget Forecast Required",
+      "body": "The Q1 planning meeting is scheduled for tomorrow morning. Please prepare and submit the budget forecast document by end of day today.",
+      "date": "2026-01-08T08:15:00Z",
+      "priority": "high",
+      "read": false,
+      "attachments": ["budget-template.xlsx"],
+      "labels": ["work", "finance", "meeting"]
+    },
+    {
+      "id": "email_03",
+      "from": "professor@university.edu",
+      "to": "user@university.edu",
+      "subject": "Research Paper Submission Reminder",
+      "body": "This is a reminder that your research paper is due in 7 days. Please ensure all sections are complete and properly cited.",
+      "date": "2026-01-07T14:20:00Z",
+      "priority": "medium",
+      "read": true,
+      "attachments": ["submission-guidelines.pdf"],
+      "labels": ["college", "academic"]
+    },
+    {
+      "id": "email_04",
+      "from": "product-team@company.com",
+      "to": "user@company.com",
+      "subject": "Weekly Standup Action Items",
+      "body": "Following up on yesterday's standup. Please sync with the product team regarding the outstanding action items we discussed.",
+      "date": "2026-01-07T16:45:00Z",
+      "priority": "medium",
+      "read": true,
+      "attachments": [],
+      "labels": ["work", "meeting", "action-items"]
+    },
+    {
+      "id": "email_05",
+      "from": "calendar@company.com",
+      "to": "user@company.com",
+      "subject": "Meeting Reminder: Q1 Planning",
+      "body": "You have a meeting scheduled: Q1 Planning Meeting tomorrow at 10:00 AM in Conference Room A.",
+      "date": "2026-01-08T07:00:00Z",
+      "priority": "medium",
+      "read": false,
+      "attachments": [],
+      "labels": ["calendar", "meeting", "reminder"]
+    }
+  ],
+  "calendar": [
+    {
+      "id": "meeting_01",
+      "title": "Q1 Planning Meeting",
+      "description": "Quarterly planning session to discuss Q1 goals and budget",
+      "start": "2026-01-09T10:00:00Z",
+      "end": "2026-01-09T11:30:00Z",
+      "location": "Conference Room A",
+      "attendees": ["user@company.com", "finance@company.com", "ceo@company.com"],
+      "status": "confirmed",
+      "type": "meeting",
+      "priority": "high"
+    },
+    {
+      "id": "meeting_02",
+      "title": "Design Review Session",
+      "description": "Review design mockups and provide feedback",
+      "start": "2026-01-09T14:00:00Z",
+      "end": "2026-01-09T15:00:00Z",
+      "location": "Design Studio",
+      "attendees": ["user@company.com", "design-team@company.com"],
+      "status": "tentative",
+      "type": "meeting",
+      "priority": "high"
+    },
+    {
+      "id": "meeting_03",
+      "title": "Weekly Standup",
+      "description": "Regular weekly team standup",
+      "start": "2026-01-10T09:00:00Z",
+      "end": "2026-01-10T09:30:00Z",
+      "location": "Virtual",
+      "attendees": ["user@company.com", "team@company.com"],
+      "status": "confirmed",
+      "type": "meeting",
+      "priority": "medium"
+    },
+    {
+      "id": "event_01",
+      "title": "Research Paper Deadline",
+      "description": "Final submission deadline for research paper",
+      "start": "2026-01-15T23:59:59Z",
+      "end": "2026-01-15T23:59:59Z",
+      "location": "Online Submission Portal",
+      "attendees": ["user@university.edu"],
+      "status": "confirmed",
+      "type": "deadline",
+      "priority": "high"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_01",
+      "title": "Review and approve design mockups",
+      "description": "Review the design mockups sent by the design team and provide feedback",
+      "context": "Hackathon Review",
+      "deadline": "2026-01-09T17:00:00Z",
+      "priority_score": 87,
+      "status": "in_progress",
+      "created": "2026-01-08T09:30:00Z",
+      "updated": "2026-01-08T10:15:00Z",
+      "source": "email",
+      "source_id": "email_01",
+      "tags": ["design", "review", "urgent"],
+      "estimated_time": "2 hours",
+      "explanation": "Design team is waiting for feedback to proceed with development. Deadline tomorrow + high importance"
+    },
+    {
+      "id": "task_02",
+      "title": "Prepare budget forecast",
+      "description": "Prepare Q1 budget forecast document for the planning meeting",
+      "context": "Hackathon Review",
+      "deadline": "2026-01-09T09:00:00Z",
+      "priority_score": 75,
+      "status": "not_started",
+      "created": "2026-01-08T08:15:00Z",
+      "updated": "2026-01-08T08:15:00Z",
+      "source": "email",
+      "source_id": "email_02",
+      "tags": ["finance", "planning", "meeting"],
+      "estimated_time": "3 hours",
+      "explanation": "Q1 planning meeting is tomorrow morning"
+    },
+    {
+      "id": "task_03",
+      "title": "Complete research paper",
+      "description": "Finish writing and editing the research paper for submission",
+      "context": "College",
+      "deadline": "2026-01-15T23:59:59Z",
+      "priority_score": 65,
+      "status": "not_started",
+      "created": "2026-01-07T14:20:00Z",
+      "updated": "2026-01-07T14:20:00Z",
+      "source": "email",
+      "source_id": "email_03",
+      "tags": ["academic", "writing", "research"],
+      "estimated_time": "8 hours",
+      "explanation": "Due in 7 days + medium importance"
+    },
+    {
+      "id": "task_04",
+      "title": "Sync with product team",
+      "description": "Follow up on action items from weekly standup",
+      "context": "Hackathon Review",
+      "deadline": null,
+      "priority_score": 55,
+      "status": "not_started",
+      "created": "2026-01-07T16:45:00Z",
+      "updated": "2026-01-07T16:45:00Z",
+      "source": "email",
+      "source_id": "email_04",
+      "tags": ["meeting", "follow-up", "action-items"],
+      "estimated_time": "1 hour",
+      "explanation": "Outstanding action items from weekly standup"
+    },
+    {
+      "id": "task_05",
+      "title": "Prepare presentation slides",
+      "description": "Create presentation slides for the upcoming college presentation",
+      "context": "College",
+      "deadline": "2026-01-20T14:00:00Z",
+      "priority_score": 60,
+      "status": "not_started",
+      "created": "2026-01-06T10:00:00Z",
+      "updated": "2026-01-06T10:00:00Z",
+      "source": "manual",
+      "source_id": null,
+      "tags": ["academic", "presentation"],
+      "estimated_time": "4 hours",
+      "explanation": "Presentation scheduled for next week"
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc_02",
+      "title": "Hackathon Proposal Deck",
+      "type": "presentation",
+      "created": "2026-01-05T10:00:00Z",
+      "modified": "2026-01-07T15:30:00Z",
+      "size": "2.5 MB",
+      "url": "/documents/hackathon-proposal.pdf",
+      "related_tasks": ["task_01"],
+      "tags": ["hackathon", "proposal"]
+    },
+    {
+      "id": "doc_05",
+      "title": "Q1 Planning Document",
+      "type": "document",
+      "created": "2026-01-03T09:00:00Z",
+      "modified": "2026-01-08T08:00:00Z",
+      "size": "1.2 MB",
+      "url": "/documents/q1-planning.docx",
+      "related_tasks": ["task_02"],
+      "tags": ["planning", "finance", "q1"]
+    }
+  ],
+  "contexts": [
+    {
+      "id": "ctx_hackathon",
+      "name": "Hackathon Review",
+      "description": "Project related to hackathon proposal and review process",
+      "created": "2026-01-05T10:00:00Z",
+      "urgency": "high",
+      "deadline": "2026-01-10T17:00:00Z",
+      "related_items": {
+        "emails": ["email_01", "email_02", "email_04"],
+        "tasks": ["task_01", "task_02", "task_04"],
+        "documents": ["doc_02"],
+        "meetings": ["meeting_01", "meeting_02"]
+      },
+      "tags": ["work", "project", "urgent"]
+    },
+    {
+      "id": "ctx_college",
+      "name": "College",
+      "description": "Academic work including research papers and presentations",
+      "created": "2026-01-01T08:00:00Z",
+      "urgency": "medium",
+      "deadline": "2026-01-15T23:59:59Z",
+      "related_items": {
+        "emails": ["email_03"],
+        "tasks": ["task_03", "task_05"],
+        "documents": [],
+        "meetings": ["event_01"]
+      },
+      "tags": ["academic", "education"]
+    }
+  ],
+  "cognitive_load": {
+    "score": 78,
+    "status": "High",
+    "active_contexts": 2,
+    "urgent_tasks": 2,
+    "switches": 12,
+    "breakdown": "2 parallel contexts + 2 urgent deadlines + 12 switches today",
+    "last_updated": "2026-01-08T12:00:00Z"
+  },
+  "insights": [
+    {
+      "id": "insight_01",
+      "type": "context_switching",
+      "severity": "high",
+      "count": 12,
+      "message": "You switched between contexts 12 times today, losing ~4 hours of focus time",
+      "timestamp": "2026-01-08T12:00:00Z"
+    },
+    {
+      "id": "insight_02",
+      "type": "ignored_priority",
+      "severity": "medium",
+      "task": "Review and approve design mockups",
+      "task_id": "task_01",
+      "message": "Design mockups review (high priority) has no activity for 2 days",
+      "timestamp": "2026-01-08T11:00:00Z"
+    },
+    {
+      "id": "insight_03",
+      "type": "deadline_proximity",
+      "severity": "high",
+      "tasks": ["Review and approve design mockups", "Prepare budget forecast"],
+      "task_ids": ["task_01", "task_02"],
+      "message": "2 tasks with deadlines tomorrow need immediate attention",
+      "timestamp": "2026-01-08T10:00:00Z"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec_01",
+      "action": "Block 9-11 AM tomorrow for Hackathon Review only",
+      "reason": "Deadline tomorrow + high switching detected",
+      "expected_impact": "Complete design review and budget forecast in single focus session",
+      "priority": "high",
+      "timestamp": "2026-01-08T12:00:00Z"
+    },
+    {
+      "id": "rec_02",
+      "action": "Defer College tasks to next week",
+      "reason": "Reduce cognitive load from 78 to ~50",
+      "expected_impact": "Lower stress and finish urgent work first",
+      "priority": "medium",
+      "timestamp": "2026-01-08T12:00:00Z"
+    },
+    {
+      "id": "rec_03",
+      "action": "Batch all Hackathon Review tasks together",
+      "reason": "Minimize context switching between related work",
+      "expected_impact": "Complete 3 tasks in 2 hours instead of 4 hours",
+      "priority": "medium",
+      "timestamp": "2026-01-08T11:30:00Z"
+    }
+  ]
+}
