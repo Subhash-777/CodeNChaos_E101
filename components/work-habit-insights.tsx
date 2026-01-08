@@ -5,18 +5,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Loader2 } from "lucide-react"
 import { fetchCognitiveLoad, fetchInsights, type CognitiveLoad, type Insight } from "@/lib/api"
+import { useSync } from "@/lib/sync-context"
+import { useUser } from "@/lib/user-context"
 
 export default function WorkHabitInsights() {
+  const { refreshKey } = useSync()
+  const { userId } = useUser()
   const [cognitiveLoad, setCognitiveLoad] = useState<CognitiveLoad | null>(null)
   const [insights, setInsights] = useState<Insight[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!userId) {
+      setLoading(false)
+      return
+    }
+    
     async function loadData() {
       try {
         setLoading(true)
-        const [loadData, insightsData] = await Promise.all([fetchCognitiveLoad(), fetchInsights()])
+        const [loadData, insightsData] = await Promise.all([fetchCognitiveLoad(userId), fetchInsights(userId)])
         setCognitiveLoad(loadData)
         setInsights(insightsData)
         setError(null)
@@ -27,8 +36,18 @@ export default function WorkHabitInsights() {
         setLoading(false)
       }
     }
+    
+    // Initial load
     loadData()
-  }, [])
+    
+    // Auto-refresh every 30 seconds
+    const autoRefreshInterval = setInterval(() => {
+      console.log("🔄 Auto-refreshing work habit insights for user:", userId.substring(0, 8) + "...")
+      loadData()
+    }, 30000)
+    
+    return () => clearInterval(autoRefreshInterval)
+  }, [refreshKey, userId]) // Refetch when sync completes or user changes
 
   // Generate task switching data from cognitive load switches
   const taskSwitchingData = cognitiveLoad
@@ -77,6 +96,23 @@ export default function WorkHabitInsights() {
         </CardHeader>
         <CardContent>
           <div className="text-center text-slate-500 text-sm py-8">{error}</div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // If no data, show empty state
+  if (!cognitiveLoad || (insights.length === 0 && cognitiveLoad.score === 0)) {
+    return (
+      <Card className="border-slate-200 shadow-sm rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-slate-900">Work Habit Insights</CardTitle>
+          <CardDescription>Your task switching and completion patterns</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-slate-500 text-sm py-8">
+            No insights available. Connect and sync your Google account to see work habit insights.
+          </div>
         </CardContent>
       </Card>
     )

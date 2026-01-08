@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { X, Send, Loader2 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useUser } from "@/lib/user-context"
+import { auth } from "@/lib/firebase"
 
 interface AIChatPanelProps {
   isOpen: boolean
@@ -17,13 +19,18 @@ interface Message {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
-async function askAssistant(userQuery: string): Promise<string> {
+async function askAssistant(userQuery: string, userId: string | null): Promise<string> {
   try {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    }
+    if (userId) {
+      headers["X-User-Id"] = userId
+    }
+    
     const response = await fetch(`${API_URL}/assistant`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         query: userQuery,
       }),
@@ -42,12 +49,13 @@ async function askAssistant(userQuery: string): Promise<string> {
 }
 
 export default function AIChatPanel({ isOpen, onClose }: AIChatPanelProps) {
+  const { userId } = useUser()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return
+    if (!input.trim() || isLoading || !userId) return
 
     const userMessage: Message = { role: "user", content: input.trim() }
     setMessages((prev) => [...prev, userMessage])
@@ -55,7 +63,7 @@ export default function AIChatPanel({ isOpen, onClose }: AIChatPanelProps) {
     setIsLoading(true)
 
     try {
-      const response = await askAssistant(userMessage.content)
+      const response = await askAssistant(userMessage.content, userId)
       const assistantMessage: Message = { role: "assistant", content: response }
       setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {

@@ -9,9 +9,6 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'Dashboard - Personal Productivity Intelligence',
   description: 'Dashboard - Personal Productivity Intelligence',
-  icons: {
-    icon: '/icon.svg',
-  },
   manifest: '/manifest.json',
   themeColor: '#000000',
   viewport: {

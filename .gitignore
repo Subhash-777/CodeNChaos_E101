@@ -25,3 +25,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Google OAuth credentials (sensitive)
+backend/credentials.json
+backend/token.json
+backend/data/

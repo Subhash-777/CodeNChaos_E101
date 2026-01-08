@@ -1,6 +1,14 @@
 # Productivity Dashboard Backend
 
-FastAPI backend that connects to Ollama for AI-powered work assistant with synthetic data training.
+FastAPI backend that connects to Ollama for AI-powered work assistant with Google Calendar & Gmail integration.
+
+## Features
+
+- **Ollama Integration**: Uses `qwen2.5:3b-instruct` model on `localhost:11434`
+- **Google Calendar & Gmail**: Real-time integration with Google APIs
+- **Synthetic Data Training**: Few-shot learning examples for better responses
+- **Privacy-Safe**: Sanitized data before sending to LLM
+- **Mock Data Fallback**: Works with mock.json if Google sync hasn't run
 
 ## Setup
 
@@ -16,12 +24,10 @@ FastAPI backend that connects to Ollama for AI-powered work assistant with synth
    - Pull the model: `ollama pull qwen2.5:3b-instruct`
    - Verify: `ollama list` (should show qwen2.5:3b-instruct)
 
-3. **Configure environment variables (optional):**
-   ```bash
-   export OLLAMA_URL=http://localhost:11434
-   export OLLAMA_MODEL=qwen2.5:3b-instruct
-   export USE_SYNTHETIC_DATA=false  # Set to true to include synthetic training data
-   ```
+3. **Google Integration Setup** (Optional):
+   - Follow instructions in `GOOGLE_SETUP.md`
+   - Download `credentials.json` from Google Cloud Console
+   - Place it in the `backend/` directory
 
 4. **Start the FastAPI server:**
    ```bash
@@ -46,25 +52,21 @@ cd backend
 python test_connection.py
 ```
 
-Or test manually:
-```bash
-curl http://localhost:11434/api/tags
-curl -X POST http://localhost:11434/api/chat -d '{
-  "model": "qwen2.5:3b-instruct",
-  "messages": [{"role": "user", "content": "Hello!"}],
-  "stream": false
-}'
-```
-
 ## API Endpoints
 
+### Core Endpoints
 - `POST /assistant` - Send a query to the AI assistant
-  - Request body: `{"query": "What should I focus on today?"}`
-  - Returns: `{"response": "...", "context_used": {...}}`
+- `GET /api/dashboard` - Get all dashboard data
+- `GET /api/contexts` - Get work contexts
+- `GET /api/tasks` - Get prioritized tasks
+- `GET /api/cognitive-load` - Get cognitive load metrics
+- `GET /api/insights` - Get behavioral insights
+- `GET /api/recommendations` - Get recommendations
 
-- `GET /health` - Health check endpoint (also tests Ollama connection)
-
-- `GET /` - API info and status
+### Google Integration Endpoints
+- `GET /api/google/auth` - Trigger Google OAuth authentication
+- `POST /api/google/sync` - Manually sync Google Calendar & Gmail data
+- `GET /api/google/status` - Check Google connection status
 
 ## Configuration
 
@@ -84,26 +86,43 @@ export OLLAMA_MODEL=qwen2.5:3b-instruct
 export USE_SYNTHETIC_DATA=true
 ```
 
-## Synthetic Data Training
+## Data Sources
 
-The backend includes synthetic data generation for few-shot learning:
+The backend loads data from multiple sources (in priority order):
 
-- **Training Examples**: Built-in examples showing proper response format
-- **Synthetic Contexts**: Generated work contexts for training
-- **Synthetic Tasks**: Generated tasks with various priorities and deadlines
-- **Synthetic Insights**: Generated behavioral insights
+1. **Google Calendar & Gmail** (if synced)
+   - Stored in: `backend/data/calendar.json` and `backend/data/emails.json`
+   - Fetched via: `POST /api/google/sync`
 
-Enable synthetic data by setting `USE_SYNTHETIC_DATA=true`. This merges synthetic data with real mock data to provide more training context to the model.
+2. **Mock Data** (fallback)
+   - Stored in: `backend/mock.json`
+   - Used when Google sync hasn't run
 
-## Mock Data
+All data is automatically processed by existing intelligence layers:
+- Context Detection
+- Task Extraction
+- Priority Scoring
+- Cognitive Load Estimation
+- Behavioral Analysis
 
-All mock data functions are in `main.py`:
-- `get_active_contexts()` - Returns work contexts
-- `get_prioritized_tasks()` - Returns prioritized tasks
-- `get_cognitive_load()` - Returns cognitive load metrics
-- `get_latest_insights()` - Returns behavioral insights
-- `get_recommendations()` - Returns action recommendations
+## Files Structure
+
+```
+backend/
+├── main.py                 # FastAPI application
+├── mock.json              # Mock data (emails, calendar, tasks)
+├── credentials.json       # Google OAuth credentials (download from Google Cloud)
+├── token.json            # Saved OAuth token (auto-generated)
+├── data/                 # Synced Google data
+│   ├── calendar.json     # Calendar events
+│   └── emails.json       # Email metadata
+├── services/
+│   ├── google_sync.py    # Google API integration
+│   ├── data_loader.py    # Unified data loading
+│   └── privacy.py        # Privacy sanitization
+└── requirements.txt      # Python dependencies
+```
 
 ## Next Steps
 
-Replace the mock data functions with actual database queries when you have your data storage set up.
+See `GOOGLE_SETUP.md` for detailed Google integration instructions.

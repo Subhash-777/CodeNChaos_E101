@@ -4,17 +4,26 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 import { fetchTasks, type Task } from "@/lib/api"
+import { useSync } from "@/lib/sync-context"
+import { useUser } from "@/lib/user-context"
 
 export default function PriorityExplanation() {
+  const { refreshKey } = useSync()
+  const { userId } = useUser()
   const [topTask, setTopTask] = useState<Task | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!userId) {
+      setLoading(false)
+      return
+    }
+    
     async function loadTopTask() {
       try {
         setLoading(true)
-        const data = await fetchTasks()
+        const data = await fetchTasks(userId)
         // Get the highest priority task
         const sortedTasks = data.sort((a, b) => b.priority_score - a.priority_score)
         setTopTask(sortedTasks[0] || null)
@@ -26,8 +35,18 @@ export default function PriorityExplanation() {
         setLoading(false)
       }
     }
+    
+    // Initial load
     loadTopTask()
-  }, [])
+    
+    // Auto-refresh every 30 seconds
+    const autoRefreshInterval = setInterval(() => {
+      console.log("🔄 Auto-refreshing priority explanation for user:", userId.substring(0, 8) + "...")
+      loadTopTask()
+    }, 30000)
+    
+    return () => clearInterval(autoRefreshInterval)
+  }, [refreshKey, userId]) // Refetch when sync completes or user changes
 
   if (loading) {
     return (
@@ -45,7 +64,7 @@ export default function PriorityExplanation() {
     )
   }
 
-  if (error || !topTask) {
+  if (error) {
     return (
       <Card className="border-slate-200 shadow-sm rounded-2xl">
         <CardHeader>
@@ -53,10 +72,31 @@ export default function PriorityExplanation() {
           <CardDescription>Explainable AI breakdown</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-slate-500 text-sm py-8">{error || "No tasks available"}</div>
+          <div className="text-center text-slate-500 text-sm py-8">{error}</div>
         </CardContent>
       </Card>
     )
+  }
+
+  // Show content when available (backend will provide mock data if Google data is empty)
+  if (!topTask && !loading) {
+    return (
+      <Card className="border-slate-200 shadow-sm rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-slate-900">Why This Task Is Priority #1</CardTitle>
+          <CardDescription>Explainable AI breakdown</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-slate-500 text-sm py-8">
+            No priority task available. Connect and sync your Google account to see task explanations.
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!topTask) {
+    return null // Still loading
   }
 
   // Determine factors based on task data
