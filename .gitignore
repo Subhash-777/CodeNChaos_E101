@@ -30,3 +30,13 @@ next-env.d.ts
 backend/credentials.json
 backend/token.json
 backend/data/
+
+# Google OAuth
+backend/token*.json
+backend/credentials.json
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
